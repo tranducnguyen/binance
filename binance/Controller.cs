@@ -1,5 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using PlaywrightSharp;
+using RegPlaywright.Controller;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -20,7 +22,7 @@ namespace binance
         string pathProfile = "";
         ChromeDriver driver;
         string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
-        public void thaotac_play(string nameprofile = "2", string proxy = "",string useragent_="")
+        public void thaotac_play(string nameprofile = "2", string proxy = "", string useragent_ = "")
         {
             //tiep:
             string ProfileFolderpath = "Profile";
@@ -43,7 +45,8 @@ namespace binance
             chService.HideCommandPromptWindow = true;
             co.AddArgument("--window-size=300,600");
             co.AddArgument("--disable-notifications");
-            if (string.IsNullOrEmpty(useragent_)) {
+            if (string.IsNullOrEmpty(useragent_))
+            {
                 co.AddArgument($"--user-agent={userAgent}");
 
             }
@@ -51,7 +54,7 @@ namespace binance
             {
                 co.AddArgument($"--user-agent={useragent_}");
             }
-            
+
             if (!string.IsNullOrEmpty(proxy))
             {
                 co.AddExtension(Directory.GetCurrentDirectory() + "\\Extension\\Proxy Auto Auth.crx");
@@ -135,12 +138,12 @@ namespace binance
                         if (countResend > 0)
                         {
                             driver.FindElementByXPath("//button[@data-v-09dbe9da]").Click();
-                            Console.WriteLine("thu lai lan " + (3-countResend));
+                            Console.WriteLine("thu lai lan " + (3 - countResend));
                             countResend--;
-                            
+
                             goto thulai;
                         }
-                        
+
                     }
 
                     driver.Manage().Cookies.DeleteAllCookies();
@@ -153,6 +156,186 @@ namespace binance
                 }
             }
             //goto tiep;
+        }
+        public void regPlay(string nameprofile = "0", string proxy = "", string useragent_ = "")
+        {
+            regPlayWight(nameprofile, proxy, useragent_).Wait();
+
+        }
+        async Task regPlayWight(string nameprofile = "0", string proxy = "", string useragent_ = "")
+        {
+            ChroniumReg chromeItem = new ChroniumReg();
+            LaunchPersistentOptions options;
+            if (string.IsNullOrEmpty(proxy))
+            {
+                options = new LaunchPersistentOptions
+                {
+                    Headless = false,
+                    Args = new string[] {
+                "--disable-notifications",
+                "--blink-settings=imagesEnable=false",
+                "--window-size=300,600",
+                "--disable-extensions",
+                "--disable-translate",
+                "--disable-gpu"},
+                    ExecutablePath = pathBrowser,
+                    IgnoreDefaultArgs = new string[] {
+                    "--enable-automation",
+                    "--disable-infobars",
+                },
+                    UserAgent = useragent_,
+                    IgnoreAllDefaultArgs = false,
+
+                    Timeout = 120000
+                };
+            }
+            else
+            {
+                ProxySettings proxy1 = new ProxySettings();
+                proxy1.Username = "tien271101";
+                proxy1.Password = "207609";
+                proxy1.Server = proxy;
+                options = new LaunchPersistentOptions
+                {
+                    Headless = false,
+                    Args = new string[] {
+                //"--window-position="+x+","+y,
+                //"--app=https://p.facebook.com/",
+                "--disable-notifications",
+                "--blink-settings=imagesEnable=false",
+                "--window-size=300,600",
+                "--disable-extensions",
+                "--disable-translate",
+                "--disable-gpu"},
+                    ExecutablePath = pathBrowser,
+                    IgnoreDefaultArgs = new string[] {
+                    "--enable-automation",
+                    "--disable-infobars",
+                },
+                    UserAgent = useragent_,
+                    Proxy = proxy1,
+                    IgnoreAllDefaultArgs = false,
+                    Timeout = 120000,
+
+                };
+            }
+
+            chromeItem.Browser = null;
+            chromeItem.Playwright = await Playwright.CreateAsync();
+
+
+            int count = 5;
+            do
+            {
+                try
+                {
+                    chromeItem.Browser = await chromeItem.Playwright.Chromium.LaunchPersistentContextAsync(Directory.GetCurrentDirectory() + "\\Profile\\" + nameprofile, options);
+                }
+                catch
+                {
+                    if (chromeItem.Browser != null)
+                    {
+                        await chromeItem.Browser.CloseAsync().ConfigureAwait(false);
+                        await chromeItem.Browser.DisposeAsync().ConfigureAwait(false);
+                        chromeItem.DisposeBrowser();
+                    }
+                    chromeItem.Browser = null;
+                }
+                await Task.Delay(100);
+                count--;
+            } while (chromeItem.Browser == null && count > 0);
+
+            await chromeItem.Browser.ClearCookiesAsync();
+            await chromeItem.Browser.ClearPermissionsAsync();
+            string email = "";
+            string[] vplsit;
+            string fullname = "";
+            string pass = "100101MN";
+            string urlLinkVeri = "";
+            int countResend;
+            IPage Page;
+            Page = chromeItem.Browser.Pages[0];
+            bool check = false;
+
+            while (true)
+            {
+                email = createEmail();
+                vplsit = email.Split('@');
+                fullname = vplsit[0].Substring(0, 3) + " " + vplsit[0].Substring(3, vplsit[0].Length - 3);
+                await Page.RouteAsync("**", (router, e) =>
+                {
+                    if (e.ResourceType == ResourceType.Image || e.ResourceType == ResourceType.Images || e.ResourceType == ResourceType.StyleSheet || e.ResourceType == ResourceType.Font || e.ResourceType == ResourceType.Media)
+                        router.AbortAsync();
+                    else
+                        router.ContinueAsync();
+                });
+                await Page.GoToAsync("https://eifi.com/register/U9FwaMnIBw");
+
+                await Task.Delay(1000);
+                check = false;
+                while (!check)
+                {
+                    try
+                    {
+                        await Page.TypeAsync("//input[@type='email']", email).ConfigureAwait(false);
+                        await Task.Delay(300);
+                        check = true;
+                    }
+                    catch
+                    {
+                        await Task.Delay(1000);
+                    }
+                }
+                try
+                {
+                    await Page.TypeAsync("//input[@placeholder='Full Name']", fullname).ConfigureAwait(false);
+                    await Task.Delay(300);
+
+                    await Page.TypeAsync("//input[@placeholder='Password']", pass).ConfigureAwait(false);
+                    await Task.Delay(300);
+                    await Page.TypeAsync("//input[@placeholder='Confirm Password']", pass).ConfigureAwait(false);
+                    await Task.Delay(300);
+                    await Page.ClickAsync("//button[@type='submit']").ConfigureAwait(false);
+
+
+                    countResend = 2;
+                thulai:
+                    urlLinkVeri = getCodeReg(email, "1'");
+                    if (!string.IsNullOrEmpty(urlLinkVeri))
+                    {
+                        await Page.GoToAsync(urlLinkVeri).ConfigureAwait(false);
+                        bool flag = false;
+                        int icount = 10;
+                        while (!flag && icount > 0)
+                        {
+                            if (Page.Url.Contains("eifi.com"))
+                            {
+                                flag = true;
+                            }
+                            icount--;
+                            await Task.Delay(1000);
+                        }
+                        Debug.Print($"{email} Success!");
+                        File.AppendAllText("mailEifi.txt", email + "|" + pass + "\n");
+                    }
+                    else
+                    {
+                        if (countResend > 0)
+                        {
+                            await Page.ClickAsync("//button[@data-v-09dbe9da]").ConfigureAwait(false);
+                            Console.WriteLine($"{email} try again {(3 - countResend)} time");
+                            countResend--;
+                            goto thulai;
+                        }
+
+                    }
+                    await chromeItem.Browser.ClearCookiesAsync().ConfigureAwait(false);
+
+
+                }
+                catch { await chromeItem.Browser.ClearCookiesAsync().ConfigureAwait(false); }
+
+            }
         }
         string createEmail()
         {

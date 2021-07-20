@@ -93,51 +93,43 @@ namespace binance
             {
                 process.Kill();
             }
-            foreach (var process in Process.GetProcessesByName("chrome"))
-            {
-                process.Kill();
-            }
+            //foreach (var process in Process.GetProcessesByName("chrome"))
+            //{
+            //    process.Kill();
+            //}
             Thread t = new Thread(() =>
             {
-                string[] proxys = new string[] { "s9.vietpn.co:1808", "s9.vietpn.co:1808", "p6.vietpn.co:1808" ,"s4.vietpn.co:1808","125.212.251.75:1808",
-"123.31.45.40:1808",
-"p20.vietpn.co:1808",
-"p3.vietpn.co:1808",
-"p10.vietpn.co:1808"};
-                string[] useragents = new string[] { "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36", 
-                    "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36", 
-                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36", 
+                string[] proxys = new string[] {
+                    "s9.vietpn.co:1808",
+                    "s9.vietpn.co:1808",
+                    "p6.vietpn.co:1808" ,
+                    "s4.vietpn.co:1808",
+                    "125.212.251.75:1808",
+                    "123.31.45.40:1808",
+                    "p20.vietpn.co:1808",
+                    "p3.vietpn.co:1808",
+                    "p10.vietpn.co:1808"};
+                string[] useragents = new string[] {"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36", 
+                    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
+                    "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36",
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
                     "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
-                "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3424.0 Safari/537.36",
+                    "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3424.0 Safari/537.36",
                     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36",
                     "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
                     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36"};
-                for (int i = 0; i < 1 + 1; i++)
+                for (int i = 0; i < 0 + 1; i++)
                 {
                     int vitri = i;
-                    if (vitri == 0)
+                    Thread t1 = new Thread(() =>
                     {
-                        Thread t1 = new Thread(() =>
-                        {
-                            Controller controller = new Controller();
-                            controller.thaotac_play(vitri.ToString(),"", useragents[vitri]);
-                        });
-                        t1.IsBackground = true;
-                        t1.Start();
-                    }
-                    else
-                    {
-                        Thread t1 = new Thread(() =>
-                        {
-                            Controller controller = new Controller();
-                            controller.thaotac_play(vitri.ToString(), proxys[vitri -1], useragents[vitri]);
-                        });
-                        t1.IsBackground = true;
-                        t1.Start();
-                    }
-
+                        Controller controller = new Controller();
+                        controller.regPlay(vitri.ToString(), proxys[vitri], useragents[vitri]);
+                    });
+                    t1.IsBackground = true;
+                    t1.Start();
                 }
 
 
